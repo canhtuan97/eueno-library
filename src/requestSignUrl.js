@@ -1,7 +1,7 @@
-const axios = require('axios');
-const {apiV1} = require("./const");
+import axios from "axios";
+import {apiV1} from "./config.js";
 
-const requestSignUrl = async (opts, metadata) => {
+export const requestSignUrl = async (opts, metadata) => {
     try {
         const result = await axios({
             method: 'post',
@@ -26,4 +26,3 @@ const requestSignUrl = async (opts, metadata) => {
     }
 };
 
-module.exports.requestSignUrl = requestSignUrl;

@@ -1,11 +1,10 @@
-const createTorrent = require('create-torrent');
+import createTorrent from "create-torrent";
 
-const createTorrentFile = (input, opts) => {
+export const createTorrentFile = (input, opts) => {
     return new Promise(resolve => {
         createTorrent(input, opts, async (err, torrent) => {
+            console.log(torrent);
             resolve(torrent);
         });
     });
 };
-
-module.exports.createTorrentFile = createTorrentFile;

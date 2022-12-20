@@ -1,6 +1,6 @@
-const axios = require('axios');
+import axios from "axios";
 
-const uploadFileTorrent = async (file, opts) => {
+export const uploadFileTorrent = async (file, opts) => {
     try {
         const result = await axios({
             method: 'put',
@@ -16,5 +16,3 @@ const uploadFileTorrent = async (file, opts) => {
     }
 
 };
-
-module.exports.uploadFileTorrent = uploadFileTorrent;

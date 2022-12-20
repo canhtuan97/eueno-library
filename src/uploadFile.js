@@ -1,6 +1,6 @@
-const axios = require('axios');
+import axios from "axios";
 
-const uploadFile = async (file, opts, metadata) => {
+export const uploadFile = async (file, opts, metadata) => {
     try {
         const result = await axios({
             method: 'put',
@@ -17,4 +17,3 @@ const uploadFile = async (file, opts, metadata) => {
 
 };
 
-module.exports.uploadFile = uploadFile;

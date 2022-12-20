@@ -1,13 +1,14 @@
-const {promises: fs} = require('fs');
+import fs from 'fs/promises';
+import WebTorrent from 'webtorrent-hybrid';
 
-const {
-    announceList,
-} = require("./src/const");
+const client = new WebTorrent({dht: false});
 
-const {requestSignUrl} = require("./src/requestSignUrl");
-const {createTorrentFile} = require("./src/createTorrent");
-const {uploadFile} = require("./src/uploadFile");
-const {uploadFileTorrent} = require("./src/uploadFileTorrent");
+import {announceList} from "./src/config.js";
+import {requestSignUrl} from "./src/requestSignUrl.js";
+import {uploadFile} from "./src/uploadFile.js";
+import {uploadFileTorrent} from "./src/uploadFileTorrent.js";
+import {seed} from "./src/seed.js";
+
 
 class Eueno {
     constructor(opts = {}) {
@@ -15,7 +16,8 @@ class Eueno {
             throw new Error('end point invalid');
         }
         this.endpoint = opts.endpoint;
-
+        this.nodeId = client.nodeId;
+        this.peerId = client.peerId;
     }
 
     async upload(input, opts, metadata) {
@@ -48,34 +50,35 @@ class Eueno {
 const upload = async (input, opts, metadata) => {
     const isFilePath = typeof input === 'string';
 
+    let file = input;
     if (isFilePath) {
-        let file = await fs.readFile(input);
-
-        let signUrl = await requestSignUrl(opts, metadata);
-        if (signUrl.status !== 200) {
-            throw new Error(`error request sign ${JSON.stringify(signUrl)}`);
-        } else {
-            opts.urlList = signUrl.data.webseed;
-            opts.urlUploadFile = signUrl.data.url_upload_file;
-            opts.urlUploadTorrent = signUrl.data.url_upload_torrent;
-        }
-        opts = await getOpts(opts);
-
-        let torrent = await createTorrentFile(input, opts);
-        const [a, b] = await Promise.all([
-            uploadFile(file, opts, metadata),
-            uploadFileTorrent(torrent, opts)],
-        );
-        if (a !== 200) {
-            throw new Error(a);
-        } else if (b !== 200) {
-            throw new Error(b);
-        }
-        return {
-            torrent: signUrl.data.torrent_url,
-            filename: signUrl.data.filename,
-        };
+        file = await fs.readFile(input);
     }
+
+    let signUrl = await requestSignUrl(opts, metadata);
+    if (signUrl.status !== 200) {
+        throw new Error(`error request sign ${JSON.stringify(signUrl)}`);
+    } else {
+        opts.urlList = signUrl.data.webseed;
+        opts.urlUploadFile = signUrl.data.url_upload_file;
+        opts.urlUploadTorrent = signUrl.data.url_upload_torrent;
+    }
+    opts = await getOpts(opts);
+
+    let torrent = await seed(client, input, opts);
+    const [a, b] = await Promise.all([
+        uploadFile(file, opts, metadata),
+        uploadFileTorrent(torrent, opts)],
+    );
+    if (a !== 200) {
+        throw new Error(a);
+    } else if (b !== 200) {
+        throw new Error(b);
+    }
+    return {
+        torrent: signUrl.data.torrent_url,
+        filename: signUrl.data.filename,
+    };
 };
 
 async function getOpts(opts) {
@@ -88,5 +91,4 @@ async function getOpts(opts) {
     return opts;
 }
 
-
-module.exports = Eueno;
+export default Eueno;
