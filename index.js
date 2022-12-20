@@ -1,4 +1,3 @@
-import fs from 'fs/promises';
 import WebTorrent from 'webtorrent-hybrid';
 
 const client = new WebTorrent({dht: false});
@@ -52,7 +51,7 @@ const upload = async (input, opts, metadata) => {
 
     let file = input;
     if (isFilePath) {
-        file = await fs.readFile(input);
+        throw new Error("Only buffer file");
     }
 
     let signUrl = await requestSignUrl(opts, metadata);
