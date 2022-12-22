@@ -44,9 +44,9 @@ const nodeConfig = {
     target: 'node',
     externals: [nodeExternals()],
     output: {
-        path: path.resolve(__dirname, './dist'),
-        filename: 'node.js',
-        libraryTarget: 'umd',
+        path: path.resolve(__dirname, './dist/cjs'),
+        filename: 'index.js',
+        libraryTarget: 'commonjs',
         libraryExport: 'default',
     },
 };
@@ -55,8 +55,8 @@ const browserConfig = {
     entry: './index.js',
     target: 'web',
     output: {
-        path: path.resolve(__dirname, './dist'),
-        filename: 'browser.js',
+        path: path.resolve(__dirname, './dist/mjs'),
+        filename: 'index.js',
         libraryTarget: 'umd',
         globalObject: 'this',
         libraryExport: 'default',
