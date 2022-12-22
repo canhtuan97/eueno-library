@@ -1,5 +1,4 @@
 import axios from "axios";
-
 export const uploadFile = async (file, opts, metadata) => {
     try {
         const result = await axios({
@@ -11,9 +10,8 @@ export const uploadFile = async (file, opts, metadata) => {
             data: file,
         });
         return result.status;
-    } catch (e) {
+    }
+    catch (e) {
         return `error upload file to eueno ${e}`;
     }
-
 };
-

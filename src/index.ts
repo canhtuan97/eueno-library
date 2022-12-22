@@ -2,15 +2,20 @@ import WebTorrent from 'webtorrent-hybrid';
 
 const client = new WebTorrent({dht: false});
 
-import {announceList} from "./src/config.js";
-import {requestSignUrl} from "./src/requestSignUrl.js";
-import {uploadFile} from "./src/uploadFile.js";
-import {uploadFileTorrent} from "./src/uploadFileTorrent.js";
-import {seed} from "./src/seed.js";
+import {announceList} from "./config";
+import {requestSignUrl} from "./requestSignUrl";
+import {uploadFile} from "./uploadFile";
+import {uploadFileTorrent} from "./uploadFileTorrent";
+import {seed} from "./seed";
 
 
 class Eueno {
-    constructor(opts = {}) {
+
+    endpoint: string;
+    nodeId: string;
+    peerId: string;
+
+    constructor(opts: { endpoint: string }) {
         if (opts.endpoint === undefined) {
             throw new Error('end point invalid');
         }
@@ -19,7 +24,7 @@ class Eueno {
         this.peerId = client.peerId;
     }
 
-    async upload(input, opts, metadata) {
+    async upload(input: Buffer | ArrayBuffer, opts: { bucketKey: string, endpoint: string }, metadata: { filename: string; encryption: string; action: string; contentLength: number; contentType: string }) {
         if (metadata.contentLength === undefined) {
             throw new Error('contentLength invalid');
         }
@@ -46,7 +51,7 @@ class Eueno {
 
 }
 
-const upload = async (input, opts, metadata) => {
+const upload = async (input, opts, metadata) : Promise<number|string | never| Object>=> {
     const isFilePath = typeof input === 'string';
 
     let file = input;
@@ -70,9 +75,9 @@ const upload = async (input, opts, metadata) => {
         uploadFileTorrent(torrent, opts)],
     );
     if (a !== 200) {
-        throw new Error(a);
+        return `error upload file ${a}`
     } else if (b !== 200) {
-        throw new Error(b);
+        return `error upload file torrent ${b}`
     }
     return {
         torrent: signUrl.data.torrent_url,

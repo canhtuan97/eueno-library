@@ -1,7 +1,16 @@
 import axios from "axios";
-import {apiV1} from "./config.js";
+import {apiV1} from "./config";
 
-export const requestSignUrl = async (opts, metadata) => {
+export const requestSignUrl = async (opts: {
+    endpoint: string;
+    bucketKey: string;
+}, metadata: {
+    contentLength: string;
+    contentType: string;
+    filename: string;
+    action: string;
+    encryption: string;
+}) => {
     try {
         const result = await axios({
             method: 'post',
